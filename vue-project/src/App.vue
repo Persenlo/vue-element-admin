@@ -1,23 +1,23 @@
 <template>
 
   <a-layout>
-    <a-layout-header>
+    <a-layout-header style="padding: 0; background-color: #f0f2f5;">
       <HeaderVue/>
     </a-layout-header>
 
     <a-layout>
 
-      <a-layout-sider>
+      <a-layout-sider style="padding: 0; background-color: #f0f2f5;">
         <SiderVue/>
       </a-layout-sider>
 
-      <a-layout-content>
+      <a-layout-content style="padding: 0; background-color: #f0f2f5;">
         <MainVue/>
       </a-layout-content>
 
     </a-layout>
 
-    <a-layout-footer>
+    <a-layout-footer style="padding: 0; background-color: #f0f2f5;">
       <FooterVue/>
     </a-layout-footer>
 
