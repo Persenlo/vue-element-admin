@@ -1,23 +1,23 @@
 <template>
 
   <a-layout>
-    <a-layout-header style="padding: 0; background-color: #f0f2f5;">
+    <a-layout-header style="height: 100px; padding: 0; background-color: #f0f2f5;">
       <HeaderVue/>
     </a-layout-header>
 
-    <a-layout>
+    <div style="width: 100%; display: flex;">
 
-      <a-layout-sider style="padding: 0; background-color: #f0f2f5;">
+      <div>
         <SiderVue/>
-      </a-layout-sider>
+      </div>
 
-      <a-layout-content style="padding: 0; background-color: #f0f2f5;">
+      <div style="flex-grow: 1;">
         <MainVue/>
-      </a-layout-content>
+      </div>
 
-    </a-layout>
+    </div>
 
-    <a-layout-footer style="padding: 0; background-color: #f0f2f5;">
+    <a-layout-footer style="margin-top: 30px; background-color: #f0f2f5;">
       <FooterVue/>
     </a-layout-footer>
 

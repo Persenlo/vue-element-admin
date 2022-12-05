@@ -2,8 +2,15 @@
     
     <div class="header">
 
-        <div class="header-logo">
+        <div :style="store.navOn ? 'width: 225px;':'width: 80px;'" class="header-logo">
             Logo
+        </div>
+
+        <div style="margin-left: 30px;" @click="changeNav()">
+            <ExpandButtonVue 
+                :iconurl='store.navOn ? "../../assets/icon/arrow-left-bold.png":"../../assets/icon/arrow-right-bold.png"' 
+                :text='store.navOn? "关闭":"展开"'
+            />
         </div>
 
         <div style="flex-grow: 1;"></div>
@@ -23,10 +30,15 @@
 <script setup>
 
 import UserVue from '@/components/user/User.vue'
-import { ref } from 'vue';
 import ExpandButtonVue from '../components/button/ExpandButton.vue';
 
-    
+import {useAdminStore} from '@/stores/index.js'
+
+    const store  = useAdminStore();
+
+    function changeNav(){
+        store.navOn = !store.navOn;
+    }
 
 </script>
 
@@ -35,7 +47,7 @@ import ExpandButtonVue from '../components/button/ExpandButton.vue';
 .header{
     width: 100%;
     height: 100px;
-    padding: 0 100px 0 100px;
+    padding: 0 50px 0 50px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -43,7 +55,7 @@ import ExpandButtonVue from '../components/button/ExpandButton.vue';
 /* Logo */
 .header-logo{
     /* 外观设计 */
-    width: auto;
+    width: 225px;
     height: 60px;
     padding: 0 20px 0 20px;
     border-radius: 12px;
@@ -51,7 +63,7 @@ import ExpandButtonVue from '../components/button/ExpandButton.vue';
     box-shadow: 2px 2px 2px rgb(201, 201, 201);
     /* flex布局 */
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     align-items: center;
 
     transition: 0.3s;
