@@ -14,7 +14,7 @@
         </div>
         <!-- 模板组件，之后要添加可以直接复制上面的，修改span内容和添加对应的点击事件的index -->
 
-        <!-- 测试 -->
+        <!-- 系统管理员 -->
         <div class="sider-nav-item" 
             @click="navClicked(1)"
             :style="store.navOn? 
@@ -22,10 +22,30 @@
                     'width: 48px'">
             <i class="iconfont icon-setting sider-nav-item-icon"/>
             <span class="sider-nav-item-text" v-if="store.navOn">
-                测试
+                职位设置
             </span>
         </div>
-        <!-- 测试 -->
+        <div class="sider-nav-item" 
+            @click="navClicked(2)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-setting sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                机构设置
+            </span>
+        </div>
+        <div class="sider-nav-item" 
+            @click="navClicked(3)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-setting sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                薪酬设置
+            </span>
+        </div>
+        <!-- 系统管理员 -->
 
     </div>
 </template>
@@ -33,8 +53,10 @@
 <script setup>
 import {useAdminStore} from '@/stores/index.js'
 import { onMounted, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 
     const store = useAdminStore();
+    const router = useRouter();
 
     let currentIndex = ref(0);
 
@@ -44,7 +66,17 @@ import { onMounted, ref, watch } from 'vue';
         //根据index设置对应的操作
         switch (index){
             case 0:
-                console.log("主页");
+                router.push("/")
+                break;
+            case 1:
+                //系统管理员
+                router.push("/position");
+                //经理
+
+                //专员
+
+                break;
+            case 2:
                 break;
             default:
                 break;
