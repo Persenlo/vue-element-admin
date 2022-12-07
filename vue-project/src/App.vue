@@ -1,6 +1,6 @@
 <template>
 
-  <a-layout>
+  <a-layout v-if="store.isLogin">
     <a-layout-header style="height: 100px; padding: 0; background-color: #f0f2f5;">
       <HeaderVue/>
     </a-layout-header>
@@ -23,6 +23,8 @@
 
   </a-layout>
 
+  <LoginVue v-if="!store.isLogin" />
+
 
 </template>
 
@@ -34,6 +36,14 @@ import HeaderVue from './layout/Header.vue';
 import SiderVue from './layout/Sider.vue'
 import MainVue from './layout/Main.vue';
 import FooterVue from './layout/Footer.vue';
+
+import LoginVue from './views/LoginVue.vue';
+
+import { useAdminStore } from './stores';
+
+
+  const store = useAdminStore();
+
 
 </script>
 
