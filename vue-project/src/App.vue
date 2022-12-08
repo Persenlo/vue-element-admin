@@ -1,6 +1,8 @@
 <template>
 
-  <a-layout v-if="store.isLogin">
+  <LoginVue v-if="!store.isLogin" />
+
+  <a-layout v-else>
     <a-layout-header style="height: 100px; padding: 0; background-color: #f0f2f5;">
       <HeaderVue/>
     </a-layout-header>
@@ -23,7 +25,7 @@
 
   </a-layout>
 
-  <LoginVue v-if="!store.isLogin" />
+  
 
 
 </template>

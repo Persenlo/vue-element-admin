@@ -16,7 +16,7 @@
         <div style="flex-grow: 1;"></div>
         
         <div style="margin-right: 20px;">
-            <ExpandButtonVue iconurl='../../assets/icon/add.png' text='添加'/>
+            <ExpandButtonVue iconurl='../../assets/icon/sign-out.png' text='退出' @click="logout()"/>
         </div>
 
         <div>
@@ -38,6 +38,14 @@ import {useAdminStore} from '@/stores/index.js'
 
     function changeNav(){
         store.navOn = !store.navOn;
+    }
+
+    function logout(){
+        store.token = null;
+		store.userInfo = {uid: -1, userName: "未登录", userNo: "-1", userPermission: 0};
+        store.isLogin = false;
+		localStorage.removeItem("token");
+		localStorage.removeItem("userInfo");
     }
 
 </script>
@@ -66,7 +74,7 @@ import {useAdminStore} from '@/stores/index.js'
     justify-content: center;
     align-items: center;
 
-    transition: 0.3s;
+    transition: 0.2s;
 }
 .header-logo:hover{
     box-shadow: 5px 5px 10px rgb(201, 201, 201);

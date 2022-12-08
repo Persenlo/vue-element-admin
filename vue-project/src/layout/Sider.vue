@@ -85,8 +85,8 @@ import { useRouter } from 'vue-router';
         // 设置选中颜色
         const fromItem = document.getElementsByClassName("sider-nav-item")[currentIndex.value];
         const toItem = document.getElementsByClassName("sider-nav-item")[index];
-        fromItem.style.backgroundColor = "#e6f7ff";
-        toItem.style.backgroundColor = "#bae7ff";
+        fromItem.style.backgroundColor = "#f5f7fa";
+        toItem.style.backgroundColor = "#e6e8eb";
         currentIndex.value = index;
     }
     //导航栏大小切换时保持选中
@@ -94,13 +94,13 @@ import { useRouter } from 'vue-router';
         ()=>store.navOn,
         ()=>{
         const choseItem = document.getElementsByClassName("sider-nav-item")[currentIndex.value];
-        setTimeout(function(){choseItem.style.backgroundColor = "#bae7ff";},10)
+        setTimeout(function(){choseItem.style.backgroundColor = "#e6e8eb";},10)
         }
         )
     //初始化导航栏选中项
     onMounted(()=>{
         const choseItem = document.getElementsByClassName("sider-nav-item")[currentIndex.value];
-        choseItem.style.backgroundColor = "#bae7ff";
+        choseItem.style.backgroundColor = "#e6e8eb";
     })
 
 </script>
@@ -117,7 +117,7 @@ import { useRouter } from 'vue-router';
     border-radius: 12px;
     box-shadow: 2px 2px 5px rgb(201, 201, 201);
     background-color: white;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 .sider:hover{
     box-shadow: 5px 5px 10px rgb(201, 201, 201);
@@ -129,16 +129,16 @@ import { useRouter } from 'vue-router';
     border-radius: 12px;
     padding-left: 12px;
     margin-top: 25px;
-    background-color: #e6f7ff;
+    background-color: #f5f7fa;
     /* flex布局 */
     display: flex;
     justify-content: left;
     align-items: center;
-    transition: 0.3s;
+    transition: 0.2s;
 }
 .sider-nav-item:hover{
-    background-color: #bae7ff !important;
-    transition: 0.3s;
+    background-color: #e6e8eb !important;
+    transition: 0.2s;
 }
 .sider-nav-item-icon{
     font-size: 24px;

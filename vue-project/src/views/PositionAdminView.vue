@@ -2,7 +2,7 @@
     <div class="position-header">
         <span class="position-title">职位管理</span>
         <div style="flex-grow: 1;"></div>
-        <a-button type="primary" shape="round" :size="size">
+        <a-button type="primary" shape="round" size="large">
             <i class="iconfont icon-add"></i>
             添加职位
         </a-button>

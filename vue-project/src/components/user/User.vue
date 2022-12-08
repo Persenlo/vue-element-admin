@@ -1,13 +1,20 @@
 <template>
     <div class="component-user">
-        <span class="component-user-name">用户名</span>
+        <span class="component-user-name">{{store.userInfo.userName}}</span>
         <a-avatar class="component-user-icon" :size="32" shape="square" style="border-radius: 12px;">
-
+            {{store.userInfo.userName}}
         </a-avatar>
     </div>
 </template>
 
 <script setup>
+import { useAdminStore } from '../../stores';
+
+
+
+    const store = new useAdminStore();
+
+
 
 </script>
 
@@ -34,7 +41,9 @@
 }
 
 /* 头像 */
-.component-user-icon {}
+.component-user-icon {
+    
+}
 
 /* 用户名 */
 .component-user-name {
