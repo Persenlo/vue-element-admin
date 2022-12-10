@@ -15,7 +15,12 @@
 
     <div class="position-table-contain">
         <!-- 基础表格 -->
-        <a-table :dataSource="data" :columns="columns" class="position-table-table">
+        <a-table :data-source=dataSource.data.data
+                 :columns="columns" 
+                 :pagination="pagination"
+                 :loading="loading"
+                 @change="handleTableChange"
+                 class="position-table-table">
             <!-- 表头 -->
             <template #headerCell="{ column }">
                 <template v-if="column.key === 'id'">
@@ -30,7 +35,10 @@
                 <template v-if="column.key === 'action'">
                     <div style="width: 100%; display: flex; ">
                         <a-button type="primary" style="margin-right: 10px;">编辑</a-button>
-                        <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
+                        <a-popconfirm title="是否删除该职位?" @confirm="startDeletePosition(record.pid)" ok-text="确定" cancel-text="取消">
+                            <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
+                        </a-popconfirm>
+                        
                     </div>
                 </template>
             </template>
@@ -43,7 +51,7 @@
                     title="添加职位" 
                     :confirm-loading="confirmLoading" 
                     @ok="startAddPosition" 
-                    @cancel="stopoading" 
+                    @cancel="stoploading" 
                     ok-text="提交"
                     cancel-text="取消">
                     <a-input v-model:value="newPosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
@@ -51,15 +59,27 @@
         </a-modal>
 
         <!-- 设置薪酬标准 -->
-        <a-modal v-model:visible="showSet" 
+        <a-modal v-model:visible="showSalarySet" 
                     title="设置薪酬标准" 
                     :confirm-loading="confirmLoading" 
-                    @ok="startAddPosition" 
-                    @cancel="stopoading" 
+                    @ok="" 
+                    @cancel="" 
                     ok-text="设置"
                     cancel-text="取消">
                     
 
+        </a-modal>
+
+        <!-- 编辑职位 -->
+        <a-modal v-model:visible="showEditPosition" 
+                    title="编辑职位" 
+                    :confirm-loading="confirmLoading" 
+                    @ok="" 
+                    @cancel="" 
+                    ok-text="提交"
+                    cancel-text="取消">
+                    <a-input v-model:value="newPosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
+                    <a-input v-model:value="newPosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
         </a-modal>
 
 
@@ -72,19 +92,33 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, computed} from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
+import { getPositionInfo,addPosition,deletePosition } from '../request/api/position';
+import { useAdminStore } from '../stores';
+import { usePagination } from 'vue-request';
 
 
+const store = useAdminStore();
+
+//储存当前分页信息
+let pagInfo = new reactive({
+    pageSize: 10,
+    current: 1,
+})
 
 
-//添加相关
+//添加弹窗
 let showAddPosition = ref(false);
-
+//编辑弹窗
+let showEditPosition = ref(false);
+//薪酬设置弹窗
+let showSalarySet = ref(false);
+//弹窗加载状态
 let confirmLoading = ref(false);
 
-//提交对象
+//添加对象
 let newPosition = reactive({
     pcategory: '',
     pname: ''
@@ -95,7 +129,7 @@ function addPositionClicked() {
     showAddPosition.value = true;
 }
 //关闭弹窗事件
-function stopoading(){
+function stoploading(){
     confirmLoading.value = false;
 }
 
@@ -106,14 +140,81 @@ async function startAddPosition(){
         return;
     }
     confirmLoading.value = true;
+    //开始请求
+    let res = await addPosition(newPosition,store.token);
+    if(res.data.success != true){
+        message.error('职位添加失败');
+        confirmLoading.value = false;
+    }else{
+        //添加成功
+        newPosition.pname = '';
+        newPosition.pcategory = '';
+        showAddPosition.value = false;
+        confirmLoading.value = false;
+        message.success('添加成功');
+        handleTableChange(pagInfo);
+    }
 
-
-    //添加成功
-    newPosition.pname = '';
-    newPosition.pcategory = '';
-    showAddPosition.value = false;
-    confirmLoading.value = false;
+    
 }
+
+
+//向服务器发送删除请求
+async function startDeletePosition(index){
+    let res = await deletePosition(index,store.token);
+    if(res.data.success != true){
+        message.error('职位删除失败');
+    }else{
+        //删除成功
+        message.success('删除成功');
+        handleTableChange(pagInfo);
+    }
+}
+
+
+//获取职位信息
+let res = new reactive();
+async function startGetPositionInfo(index,count){
+    res.value = (await getPositionInfo(store.token,index,count));
+    return res.value.data;
+}
+
+
+
+const {
+      data: dataSource,
+      run,
+      loading,
+      current,
+      pageSize,
+    } = usePagination(startGetPositionInfo, {
+        pagination: {
+            currentKey: 'index',
+            pageSizeKey: 'count',
+        },
+    });
+
+const pagination = computed(() => ({
+      total: dataSource.value.data.total,
+      current: current.value,
+      pageSize: pageSize.value,
+}));
+
+
+
+const handleTableChange = (pag, filters, sorter) => {
+    run({
+        count: pag?.pageSize,
+        index: pag?.current,
+        sortField: sorter?.field,
+        sortOrder: sorter?.order,
+        ...filters,
+    });
+    pagInfo.pageSize.value = pag?.pageSize;
+    pagInfo.current.value = pag?.current;
+}
+
+
 
 
 
@@ -124,18 +225,18 @@ const columns = reactive(
     [
         {
             name: '序号',
-            dataIndex: 'id',
-            key: 'id',
+            dataIndex: 'pid',
+            key: 'pid',
         },
         {
             title: '分类',
-            dataIndex: 'category',
-            key: 'category',
+            dataIndex: 'posiCategory',
+            key: 'posiCategory',
         },
         {
             title: '名称',
-            dataIndex: 'name',
-            key: 'name',
+            dataIndex: 'posiName',
+            key: 'posiName',
         },
         {
             title: '操作',
@@ -143,13 +244,7 @@ const columns = reactive(
         },
     ]
 )
-const data = [
-  {
-    key: '1',
-    id: '1',
-    category: '测试分类',
-    name: '测试名称',
-  },]
+
 
 
 
