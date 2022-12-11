@@ -3,7 +3,8 @@
     <div class="header">
 
         <div :style="store.navOn ? 'width: 225px;':'width: 80px;'" class="header-logo">
-            Logo
+            <i v-if="!store.navOn" class="iconfont icon-chart-pie" style="font-size: 25px;"></i>
+            <span v-if="store.navOn" style="font-size: 15px; font-weight: bold; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; user-select: none;">极致ADMIN</span>
         </div>
 
         <div style="margin-left: 30px;" @click="changeNav()">

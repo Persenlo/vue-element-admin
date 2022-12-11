@@ -288,7 +288,7 @@ const columns = reactive(
 
 </script>
 
-<style>
+<style scoped>
 /* 顶部容器设置为弹性布局 */
 .position-header{
     width: 100%;

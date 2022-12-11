@@ -20,9 +20,9 @@
             :style="store.navOn? 
                     'width: 193px':
                     'width: 48px'">
-            <i class="iconfont icon-setting sider-nav-item-icon"/>
+            <i class="iconfont icon-work sider-nav-item-icon"/>
             <span class="sider-nav-item-text" v-if="store.navOn">
-                职位设置
+                职位管理
             </span>
         </div>
         <div class="sider-nav-item" 
@@ -30,9 +30,9 @@
             :style="store.navOn? 
                     'width: 193px':
                     'width: 48px'">
-            <i class="iconfont icon-setting sider-nav-item-icon"/>
+            <i class="iconfont icon-menu sider-nav-item-icon"/>
             <span class="sider-nav-item-text" v-if="store.navOn">
-                机构设置
+                机构管理
             </span>
         </div>
         <div class="sider-nav-item" 
@@ -40,9 +40,9 @@
             :style="store.navOn? 
                     'width: 193px':
                     'width: 48px'">
-            <i class="iconfont icon-setting sider-nav-item-icon"/>
+            <i class="iconfont icon-chart-bar sider-nav-item-icon"/>
             <span class="sider-nav-item-text" v-if="store.navOn">
-                薪酬设置
+                薪酬管理
             </span>
         </div>
         <!-- 系统管理员 -->
@@ -70,13 +70,27 @@ import { useRouter } from 'vue-router';
                 break;
             case 1:
                 //系统管理员
-                router.push("/position");
+                router.push("/a-position");
                 //经理
 
                 //专员
 
                 break;
             case 2:
+                //系统管理员
+                router.push("/a-organization");
+                //经理
+
+                //专员
+
+                break;
+            case 3:
+                //系统管理员
+                router.push("/a-salary");
+                //经理
+
+                //专员
+
                 break;
             default:
                 break;

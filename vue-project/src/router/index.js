@@ -10,9 +10,19 @@ const router = createRouter({
       component: () => import('../views/HomeView.vue')
     },
     {
-      path: '/position',
-      name: 'position',
+      path: '/a-position',
+      name: 'a-position',
       component: () => import('../views/PositionAdminView.vue')
+    },
+    {
+      path: '/a-organization',
+      name: 'a-organization',
+      component: () => import('../views/OrganizationAdminView.vue')
+    },
+    {
+      path: '/a-salary',
+      name: 'a-salary',
+      component: () => import('../views/SalaryAdminView.vue')
     }
   ]
 })
