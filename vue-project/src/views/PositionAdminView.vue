@@ -15,7 +15,7 @@
 
     <div class="position-table-contain">
         <!-- 基础表格 -->
-        <a-table :data-source=dataSource.data.data
+        <a-table :data-source= dataSource?.data.data
                  :columns="columns" 
                  :pagination="pagination"
                  :loading="loading"
@@ -34,8 +34,8 @@
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                     <div style="width: 100%; display: flex; ">
-                        <a-button type="primary" style="margin-right: 10px;">编辑</a-button>
-                        <a-popconfirm title="是否删除该职位?" @confirm="startDeletePosition(record.pid)" ok-text="确定" cancel-text="取消">
+                        <a-button type="primary" style="margin-right: 10px;" @click="editPositionClicked(record)" >编辑</a-button>
+                        <a-popconfirm ref="popconfirm" title="是否删除该职位?" @confirm="startDeletePosition(record.pid)" ok-text="确定" cancel-text="取消">
                             <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
                         </a-popconfirm>
                         
@@ -63,7 +63,7 @@
                     title="设置薪酬标准" 
                     :confirm-loading="confirmLoading" 
                     @ok="" 
-                    @cancel="" 
+                    @cancel="stoploading" 
                     ok-text="设置"
                     cancel-text="取消">
                     
@@ -74,12 +74,12 @@
         <a-modal v-model:visible="showEditPosition" 
                     title="编辑职位" 
                     :confirm-loading="confirmLoading" 
-                    @ok="" 
-                    @cancel="" 
+                    @ok="startEditPosition" 
+                    @cancel="stoploading" 
                     ok-text="提交"
                     cancel-text="取消">
-                    <a-input v-model:value="newPosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
-                    <a-input v-model:value="newPosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
+                    <a-input v-model:value="changePosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
+                    <a-input v-model:value="changePosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
         </a-modal>
 
 
@@ -95,12 +95,13 @@
 import { reactive, ref, computed} from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { getPositionInfo,addPosition,deletePosition } from '../request/api/position';
+import { getPositionInfo,addPosition,deletePosition,editPosition } from '../request/api/position';
 import { useAdminStore } from '../stores';
 import { usePagination } from 'vue-request';
 
 
 const store = useAdminStore();
+const popconfirm = ref(null)
 
 //储存当前分页信息
 let pagInfo = new reactive({
@@ -124,9 +125,23 @@ let newPosition = reactive({
     pname: ''
 })
 
+//编辑对象
+let changePosition = reactive({
+    pcategory: '',
+    pid: 0,
+    pname: ''
+})
+
 //点击添加按钮
 function addPositionClicked() {
     showAddPosition.value = true;
+}
+//点击编辑按钮
+function editPositionClicked(data){
+    changePosition.pcategory = data.posiCategory;
+    changePosition.pid = data.pid;
+    changePosition.pname = data.posiName;
+    showEditPosition.value = true;
 }
 //关闭弹窗事件
 function stoploading(){
@@ -163,11 +178,30 @@ async function startAddPosition(){
 async function startDeletePosition(index){
     let res = await deletePosition(index,store.token);
     if(res.data.success != true){
-        message.error('职位删除失败');
+        message.error(res.data.msg);
     }else{
         //删除成功
         message.success('删除成功');
         handleTableChange(pagInfo);
+        
+    }
+}
+
+//向服务器发送编辑请求
+async function startEditPosition(){
+    let res = await editPosition(changePosition,store.token);
+    if(res.data.success != true){
+        confirmLoading.value = false;
+        message.error(res.data.msg);
+    }else{
+        //编辑成功
+        changePosition.pname = '';
+        changePosition.pcategory = '';
+        showEditPosition.value = false;
+        confirmLoading.value = false;
+        message.success('编辑成功');
+        handleTableChange(pagInfo);
+        
     }
 }
 
@@ -195,7 +229,7 @@ const {
     });
 
 const pagination = computed(() => ({
-      total: dataSource.value.data.total,
+      total: dataSource.value?.data.total,
       current: current.value,
       pageSize: pageSize.value,
 }));
@@ -210,8 +244,8 @@ const handleTableChange = (pag, filters, sorter) => {
         sortOrder: sorter?.order,
         ...filters,
     });
-    pagInfo.pageSize.value = pag?.pageSize;
-    pagInfo.current.value = pag?.current;
+    pagInfo.pageSize = pag?.pageSize;
+    pagInfo.current = pag?.current;
 }
 
 
@@ -227,20 +261,24 @@ const columns = reactive(
             name: '序号',
             dataIndex: 'pid',
             key: 'pid',
+            width: '10%',
         },
         {
             title: '分类',
             dataIndex: 'posiCategory',
             key: 'posiCategory',
+            width: '35%',
         },
         {
             title: '名称',
             dataIndex: 'posiName',
             key: 'posiName',
+            width: '35%',
         },
         {
             title: '操作',
             key: 'action',
+            width: '20%',
         },
     ]
 )
