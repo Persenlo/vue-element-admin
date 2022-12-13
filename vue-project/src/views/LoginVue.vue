@@ -108,6 +108,7 @@ import { useAdminStore } from '../stores';
                     store.userInfo = info.data.data;
                     localStorage.setItem("userInfo",JSON.stringify(info.data.data));
                     message.success("登录成功");
+                    location.reload();
                 }else{
                     localStorage.removeItem("token");
                     message.error("登录失败");

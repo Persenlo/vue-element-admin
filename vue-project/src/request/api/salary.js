@@ -1,11 +1,11 @@
 import service from "..";
 
 //薪酬查询
-export function getSalaryInfo(token,param){
+export function getSalaryInfo(token,param,count){
     let rindex = param.index;
     return service({
         method: "Get",
-        url: "/salary?index="+rindex+"&count="+param.count,
+        url: "/salary?index="+rindex+"&count="+8,
         params:{
             
         },
@@ -67,6 +67,24 @@ export function editSalary(SalaryData,token){
         headers:{
             'Content-Type':'application/json',
             'Authorization': token,
+        },
+        withCredentials: true,
+    })
+}
+
+// 搜索薪酬
+export function searchSalary(searchData,token){
+    return service({
+        method: "Get",
+        url: "/salary/querysalary",
+        headers:{
+            'Authorization': token,
+        },
+        params:{
+            sid: searchData.sid,
+            start: searchData.start,
+            end: searchData.end,
+            key: searchData.key,
         },
         withCredentials: true,
     })

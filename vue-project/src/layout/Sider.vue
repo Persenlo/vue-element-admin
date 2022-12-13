@@ -15,7 +15,7 @@
         <!-- 模板组件，之后要添加可以直接复制上面的，修改span内容和添加对应的点击事件的index -->
 
         <!-- 系统管理员 -->
-        <div class="sider-nav-item" 
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 10"
             @click="navClicked(1)"
             :style="store.navOn? 
                     'width: 193px':
@@ -25,7 +25,7 @@
                 职位管理
             </span>
         </div>
-        <div class="sider-nav-item" 
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 10"
             @click="navClicked(2)"
             :style="store.navOn? 
                     'width: 193px':
@@ -35,7 +35,7 @@
                 机构管理
             </span>
         </div>
-        <div class="sider-nav-item" 
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 10"
             @click="navClicked(3)"
             :style="store.navOn? 
                     'width: 193px':
@@ -46,6 +46,21 @@
             </span>
         </div>
         <!-- 系统管理员 -->
+
+        <!-- 薪酬管理员 -->
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 1"
+            @click="navClicked(1)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-chart-bar sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                薪酬登记
+            </span>
+        </div>
+        <!-- 薪酬管理员 -->
+
+
 
     </div>
 </template>
@@ -70,11 +85,11 @@ import { useRouter } from 'vue-router';
                 break;
             case 1:
                 //系统管理员
-                router.push("/a-position");
+                if(store.userInfo.userPermission == 10) router.push("/a-position");
                 //经理
 
                 //专员
-
+                if(store.userInfo.userPermission == 1) router.push("/a-salary");
                 break;
             case 2:
                 //系统管理员

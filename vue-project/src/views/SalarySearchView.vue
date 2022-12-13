@@ -1,25 +1,24 @@
 <template>
+
     <div class="salary-header">
-        <span class="salary-title">薪酬管理</span>
-        <div style="flex-grow: 1;"></div>
-        <!-- 搜索 -->
-        <a-button type="primary" shape="circle" style="margin-right: 10px;" size="large" @click="searchSalaryClicked">
+        <!-- 返回 -->
+        <a-button shape="circle" style="margin-right: 10px;" size="middle" @click="router.go(-1)">
             <template #icon>
-                <SearchOutlined />
+                <left-outlined />
             </template>
         </a-button>
-        <!-- 添加标准 -->
-        <a-button type="primary" shape="round" size="large" @click="addsalaryClicked" v-if="!isAssistant">
-            <i class="iconfont icon-add"></i>
-            添加薪酬标准
-        </a-button>
+        <span class="salary-title">搜索结果</span>
+        
     </div>
-
 
     <div class="salary-table-contain">
         <!-- 基础表格 -->
-        <a-table :data-source=dataSource?.data.data :columns="columns" :pagination="pagination" :loading="loading"
-            @change="handleTableChange" class="salary-table-table">
+        <a-table 
+            :data-source=salaryData?.data
+            :columns="columns" 
+            :loading="loading"
+            @change="handleTableChange" 
+            class="salary-table-table">
             <!-- 表头 -->
             <template #headerCell="{ column }">
                 <template v-if="column.key === 'sid'">
@@ -44,41 +43,6 @@
             </template>
         </a-table>
     </div>
-
-
-
-    <!-- 添加标准 -->
-    <a-modal v-model:visible="showAddSalary" 
-                title="添加薪酬标准" 
-                :confirm-loading="confirmLoading" 
-                @ok="startAddSalary"
-                @cancel="stoploading" 
-                ok-text="提交" 
-                cancel-text="取消">
-        <div>
-            <!-- <a-divider style="margin-top: 0;">基本内容</a-divider> -->
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">薪酬名称：</span><a-input v-model:value="newSalary.sname" placeholder="输入薪酬名称" />
-            </div>
-            <!-- <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">基本工资：</span><a-input v-model:value="newSalary.sbase" placeholder="输入基本工资"
-                    suffix="元" type="number" />
-            </div>
-            <a-divider>员工补助</a-divider>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">交通补贴：</span><a-input v-model:value="newSalary.stransport"
-                    placeholder="输入交通补贴" suffix="元" type="number" />
-            </div>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">午餐补助：</span><a-input v-model:value="newSalary.slunch"
-                    placeholder="输入午餐补助" suffix="元" type="number" />
-            </div>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">通讯补助：</span><a-input v-model:value="newSalary.scommunicate"
-                    placeholder="输入通讯补助" suffix="元" type="number" />
-            </div> -->
-        </div>
-    </a-modal>
 
 
     <!-- 编辑标准 -->
@@ -180,41 +144,26 @@
         
     </a-modal>
 
-    <!-- 搜索 -->
-    <a-modal v-model:visible="showSearchSalary" 
-                title="搜索" 
-                @ok="startSearchSalary"
-                ok-text="搜索" 
-                cancel-text="取消">
-        <div>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">薪酬编号：</span><a-input v-model:value="searchSalary.sid" placeholder="请输入薪酬编号" />
-            </div>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 100px;">薪酬关键字</span><a-input v-model:value="searchSalary.key" placeholder="输入薪酬关键字" />
-            </div>
-            <div style="display: flex; align-items: center; margin-top: 20px;">
-                <span style="width: 85px;">修改日期</span><a-range-picker v-model:value="searchSalary.date" format="YYYY-MM-DD HH:mm:ss"  valueFormat="YYYY-MM-DD HH:mm:ss" show-time  />
-            </div>
-            
-        </div>
-    </a-modal>
-    
+
+
+
+
 
 </template>
 
 <script setup>
-
-import { reactive, ref, computed } from 'vue';
-import { SearchOutlined,FormOutlined,CloseOutlined } from '@ant-design/icons-vue';
-import { message } from 'ant-design-vue';
-import { getSalaryInfo, addSalary, deleteSalary, editSalary } from '../request/api/salary';
+import { reactive, ref, onMounted } from 'vue';
+import { FormOutlined,CloseOutlined,LeftOutlined } from '@ant-design/icons-vue';
+import { useRouter,useRoute, routerKey } from 'vue-router';
 import { useAdminStore } from '../stores';
-import { usePagination } from 'vue-request';
-import { useRouter } from 'vue-router';
+import { searchSalary, editSalary } from '../request/api/salary';
+import { message } from 'ant-design-vue';
 
 const store = useAdminStore();
 const router = useRouter();
+const route = useRoute();
+
+let loading = ref(false);
 
 //储存当前分页信息
 let pagInfo = new reactive({
@@ -222,14 +171,8 @@ let pagInfo = new reactive({
     current: 1,
 })
 
-//搜索对象
-let searchSalary = reactive({
-    sid: '',
-    key: '',
-    start: '',
-    end: '',
-    date: '',
-})
+//服务器数据
+let salaryData = ref();
 
 //添加对象
 let newSalary = reactive({
@@ -258,8 +201,15 @@ let changeSalary = ref({
     salaRecheckerName: '',
     salaRegistrantName: '',
 
-})
+});
 
+//搜索对象
+let searchObj = ref({
+    sid: route.query.sid,
+    key: route.query.key,
+    start: route.query.start,
+    end: route.query.end,
+});
 
 //切换编辑状态
 function changeEditMode(){
@@ -267,10 +217,9 @@ function changeEditMode(){
     editMode.value = !editMode.value;
 }
 
-//搜索弹窗
-let showSearchSalary = ref(false);
-//添加弹窗
-let showAddSalary = ref(false);
+
+
+
 //编辑弹窗
 let showEditSalary = ref(false);
 //编辑状态
@@ -282,87 +231,19 @@ let confirmLoading = ref(false);
 //是专员
 let isAssistant = ref(store.userInfo.userPermission == "1"? true:false)
 
-//搜索按钮被点击
-async function searchSalaryClicked() {
-    showSearchSalary.value = true;
-}
-//添加薪酬按钮被点击
-async function addsalaryClicked() {
-    showAddSalary.value = true;
-}
-
 //编辑薪酬按钮被点击
 async function editSalaryClicked(data) {
     showEditSalary.value = true;
     changeSalary.value = data;
 }
 
-
-//开始搜索
-function startSearchSalary(){
-    if (searchSalary.key == '') {
-        searchSalary.key = null;
-    }
-    router.push({
-        name: 'searchSalary',
-        query: {
-            sid: searchSalary.sid,
-            key: searchSalary.key,
-            start: searchSalary.date[0],
-            end: searchSalary.date[1],
-        },
-    })
-    showSearchSalary.value = false;
-}
-
-//开始删除薪酬标准
-async function startDeleteSalary(index) {
-    let res = await deleteSalary(index,store.token);
-    if(res.data.success != true){
-        message.error(res.data.msg);
-    }else{
-        //删除成功
-        message.success('删除成功');
-        handleTableChange(pagInfo);
-        
-    }
-}
-
 //开始获取薪酬标准
-let res = new reactive();
-async function startGetSalaryInfo(index, count) {
-    res.value = (await getSalaryInfo(store.token, index, count));
-    return res.value.data;
-}
-
-//向服务器发送添加请求
-async function startAddSalary() {
-    if (newSalary.sname == '') {
-        message.error('请输入标准名');
-        return;
-    }
-    // if (newSalary.sbase == 0) {
-    //     message.error('基本工资不能为0或不能为空');
-    //     return;
-    // }
-    confirmLoading.value = true;
-    //开始请求
-    let res = await addSalary(newSalary, store.token);
-    if (res.data.success != true) {
-        message.error(res.data.msg);
-        confirmLoading.value = false;
-    } else {
-        //添加成功
-        newSalary.sname = '',
-        newSalary.sbase = '',
-        newSalary.stransport = 0,
-        newSalary.slunch = 0,
-        newSalary.scommunicate = 0,
-        showAddSalary.value = false;
-        confirmLoading.value = false;
-        message.success('添加成功');
-        handleTableChange(pagInfo);
-    }
+let res = new ref();
+async function startSearchSalaryInfo() {
+    loading.value = true;
+    res.value = (await searchSalary(searchObj.value,store.token));
+    salaryData.value = res.value.data;
+    loading.value = false;
 }
 
 //发送薪酬更新请求
@@ -403,51 +284,28 @@ async function startEditSalary() {
     }
 }
 
-
-
-//表格分页
-const {
-    data: dataSource,
-    run,
-    loading,
-    current,
-    pageSize,
-} = usePagination(startGetSalaryInfo, {
-    pagination: {
-        currentKey: 'index',
-        pageSizeKey: 'count',
-    },
-});
-
-const pagination = computed(() => ({
-    total: dataSource.value?.data.total,
-    current: current.value,
-    pageSize: pageSize.value,
-}));
-
-
-
-const handleTableChange = (pag, filters, sorter) => {
-    run({
-        count: pag?.pageSize,
-        index: pag?.current,
-        sortField: sorter?.field,
-        sortOrder: sorter?.order,
-        ...filters,
-    });
-    pagInfo.pageSize = pag?.pageSize;
-    pagInfo.current = pag?.current;
+//开始删除薪酬标准
+async function startDeleteSalary(index) {
+    let res = await deleteSalary(index,store.token);
+    if(res.data.success != true){
+        message.error(res.data.msg);
+    }else{
+        //删除成功
+        message.success('删除成功');
+        handleTableChange(pagInfo);
+        
+    }
 }
 
+onMounted(()=>{
+    console.log(searchObj.value)
+    startSearchSalaryInfo();
+})
 
 
 
 
 
-
-
-
-// 表格列
 const columns = reactive(
     [
         {
@@ -495,6 +353,7 @@ const columns = reactive(
         },
     ]
 )
+
 
 </script>
 

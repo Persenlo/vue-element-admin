@@ -65,8 +65,8 @@ import { useAdminStore } from '../stores';
     function getPremission(){
         switch (store.userInfo.userPermission){
             case 10: return("超级管理员")
-            case 9: return("经理")
-            case 8: return("专员")
+            case 2: return("经理")
+            case 1: return("专员")
             default: return("访客")
         }
     }

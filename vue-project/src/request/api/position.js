@@ -5,7 +5,7 @@ export function getPositionInfo(token,param){
     let rindex = param.index;
     return service({
         method: "Get",
-        url: "/position?index="+rindex+"&count="+param.count,
+        url: "/position?index="+rindex+"&count="+8,
         params:{
             
         },

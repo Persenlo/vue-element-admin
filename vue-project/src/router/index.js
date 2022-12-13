@@ -23,6 +23,11 @@ const router = createRouter({
       path: '/a-salary',
       name: 'a-salary',
       component: () => import('../views/SalaryAdminView.vue')
+    },
+    {
+      path: '/search-salary',
+      name: 'searchSalary',
+      component: () => import('../views/SalarySearchView.vue')
     }
   ]
 })

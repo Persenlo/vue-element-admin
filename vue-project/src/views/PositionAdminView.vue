@@ -105,7 +105,7 @@ const popconfirm = ref(null)
 
 //储存当前分页信息
 let pagInfo = new reactive({
-    pageSize: 10,
+    pageSize: 8,
     current: 1,
 })
 
