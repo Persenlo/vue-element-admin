@@ -330,7 +330,6 @@ const columns = reactive(
             title: '登记人',
             dataIndex: 'salaRegistrantName',
             key: 'salaRegistrantName',
-            
             width: '15%',
         },
         {

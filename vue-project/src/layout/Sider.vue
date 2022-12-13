@@ -45,6 +45,16 @@
                 薪酬管理
             </span>
         </div>
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 10"
+            @click="navClicked(4)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-user sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                用户管理
+            </span>
+        </div>
         <!-- 系统管理员 -->
 
         <!-- 薪酬管理员 -->
@@ -102,6 +112,14 @@ import { useRouter } from 'vue-router';
             case 3:
                 //系统管理员
                 router.push("/a-salary");
+                //经理
+
+                //专员
+
+                break;
+            case 4:
+                //系统管理员
+                router.push("/a-user");
                 //经理
 
                 //专员

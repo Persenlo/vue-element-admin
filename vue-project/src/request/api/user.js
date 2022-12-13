@@ -34,3 +34,57 @@ export function getUserInfo(token){
         withCredentials: true,
     })
 }
+
+//获取用户信息
+export function getAllUserInfo(token,param){
+    let rindex = param.index;
+    return service({
+        method: "Get",
+        url: "/user?index="+rindex+"&count=8",
+        headers:{
+            'Authorization':token,
+        },
+        withCredentials: true,
+    })
+}
+
+// 创建用户
+export function createUser(userData,token){
+    return service({
+        method: "Post",
+        url: "/user",
+        data: userData,
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization': token,
+        },
+        withCredentials: true,
+    })
+}
+
+// 编辑用户信息
+export function editUser(userData,token){
+    return service({
+        method: "PUT",
+        url: "/user",
+        data: userData,
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization': token,
+        },
+        withCredentials: true,
+    })
+}
+
+//删除用户
+export function deleteUser(id,token){
+    return service({
+        url: "/user?userId="+id,
+        method: "DELETE",
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization': token,
+        },
+        withCredentials: true,
+    })
+}

@@ -28,6 +28,11 @@ const router = createRouter({
       path: '/search-salary',
       name: 'searchSalary',
       component: () => import('../views/SalarySearchView.vue')
+    },
+    {
+      path: '/a-user',
+      name: 'userAdmin',
+      component: () => import('../views/UserAdminView.vue')
     }
   ]
 })
