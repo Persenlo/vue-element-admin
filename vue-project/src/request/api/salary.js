@@ -16,6 +16,21 @@ export function getSalaryInfo(token,param,count){
     })
 }
 
+//获取全部薪酬
+export function getAllSalaryInfo(token){
+    return service({
+        method: "Get",
+        url: "/salary?&count="+10000,
+        params:{
+            
+        },
+        headers:{
+            'Authorization':token,
+        },
+        withCredentials: true,
+    })
+}
+
 //薪酬查询(ID)
 export function getSalaryInfoByID(token,id){
     return service({

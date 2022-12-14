@@ -256,7 +256,6 @@ async function startEditSalary() {
         message.error('基本工资不能为0或不能为空');
         return;
     }else newSalary.sbase = changeSalary.value.salaBase;
-    console.log(changeSalary)
     newSalary.stransport = changeSalary.value.salaTransport;
     newSalary.slunch = changeSalary.value.salaLunch;
     newSalary.scommunicate = changeSalary.value.salaCommunicate;
@@ -298,7 +297,6 @@ async function startDeleteSalary(index) {
 }
 
 onMounted(()=>{
-    console.log(searchObj.value)
     startSearchSalaryInfo();
 })
 

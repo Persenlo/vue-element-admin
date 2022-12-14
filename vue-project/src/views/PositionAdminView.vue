@@ -4,7 +4,9 @@
         <div style="flex-grow: 1;"></div>
         <!-- 搜索 -->
         <a-button type="primary" shape="circle" style="margin-right: 10px;" size="large">
-            <template #icon><SearchOutlined /></template>
+            <template #icon>
+                <SearchOutlined />
+            </template>
         </a-button>
         <!-- 添加职位 -->
         <a-button type="primary" shape="round" size="large" @click="addPositionClicked">
@@ -15,12 +17,8 @@
 
     <div class="position-table-contain">
         <!-- 基础表格 -->
-        <a-table :data-source= dataSource?.data.data
-                 :columns="columns" 
-                 :pagination="pagination"
-                 :loading="loading"
-                 @change="handleTableChange"
-                 class="position-table-table">
+        <a-table :data-source=dataSource?.data.data :columns="columns" :pagination="pagination" :loading="loading"
+            @change="handleTableChange" class="position-table-table">
             <!-- 表头 -->
             <template #headerCell="{ column }">
                 <template v-if="column.key === 'id'">
@@ -34,68 +32,66 @@
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                     <div style="width: 100%; display: flex; ">
-                        <a-button type="primary" style="margin-right: 10px;" @click="editPositionClicked(record)" >编辑</a-button>
-                        <a-popconfirm ref="popconfirm" title="是否删除该职位?" @confirm="startDeletePosition(record.pid)" ok-text="确定" cancel-text="取消">
+                        <a-button type="primary" style="margin-right: 10px;"
+                            @click="editPositionClicked(record)">编辑</a-button>
+                        <a-button type="primary" style="margin-right: 10px;" @click="editPositionSalaryClicked(record)"
+                            :loading="salaryLoading">薪酬</a-button>
+                        <a-popconfirm ref="popconfirm" title="是否删除该职位?" @confirm="startDeletePosition(record.pid)"
+                            ok-text="确定" cancel-text="取消">
                             <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
                         </a-popconfirm>
-                        
+
                     </div>
                 </template>
             </template>
         </a-table>
-        
+
 
 
         <!-- 添加职位 -->
-        <a-modal v-model:visible="showAddPosition" 
-                    title="添加职位" 
-                    :confirm-loading="confirmLoading" 
-                    @ok="startAddPosition" 
-                    @cancel="stoploading" 
-                    ok-text="提交"
-                    cancel-text="取消">
-                    <a-input v-model:value="newPosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
-                    <a-input v-model:value="newPosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
+        <a-modal v-model:visible="showAddPosition" title="添加职位" :confirm-loading="confirmLoading" @ok="startAddPosition"
+            @cancel="stoploading" ok-text="提交" cancel-text="取消">
+            <a-input v-model:value="newPosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
+            <a-input v-model:value="newPosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
         </a-modal>
 
         <!-- 设置薪酬标准 -->
-        <a-modal v-model:visible="showSalarySet" 
-                    title="设置薪酬标准" 
-                    :confirm-loading="confirmLoading" 
-                    @ok="" 
-                    @cancel="stoploading" 
-                    ok-text="设置"
-                    cancel-text="取消">
-                    
+        <a-modal v-model:visible="showSalarySet" title="设置薪酬标准" :confirm-loading="confirmLoading" @ok="startEditPositionSalary"
+            @cancel="stoploading" ok-text="设置" cancel-text="取消">
+            <a-select 
+                :value="salarySetObj.psalary" 
+                style="width: 100%" 
+                :placeholder="cSalaryName==''? '请选择薪酬标准': cSalaryName"
+                :options="salaryList"
+                :field-names="{ label: 'salaName', value: 'sid' }" 
+                @change="handleSalarySelect">
+            </a-select>
 
         </a-modal>
 
         <!-- 编辑职位 -->
-        <a-modal v-model:visible="showEditPosition" 
-                    title="编辑职位" 
-                    :confirm-loading="confirmLoading" 
-                    @ok="startEditPosition" 
-                    @cancel="stoploading" 
-                    ok-text="提交"
-                    cancel-text="取消">
-                    <a-input v-model:value="changePosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
-                    <a-input v-model:value="changePosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
+        <a-modal v-model:visible="showEditPosition" title="编辑职位" :confirm-loading="confirmLoading"
+            @ok="startEditPosition" @cancel="stoploading" ok-text="提交" cancel-text="取消">
+            <a-input v-model:value="changePosition.pcategory" placeholder="职位分类" style="margin-top: 10px;" />
+            <a-input v-model:value="changePosition.pname" placeholder="职位名称" style="margin-top: 10px;" />
         </a-modal>
 
 
-        
+
+
     </div>
 
 
-    
-    
+
+
 </template>
 
 <script setup>
-import { reactive, ref, computed} from 'vue';
+import { reactive, ref, computed } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
-import { getPositionInfo,addPosition,deletePosition,editPosition } from '../request/api/position';
+import { getPositionInfo, addPosition, deletePosition, editPosition } from '../request/api/position';
+import { getAllSalaryInfo, getSalaryInfoByID } from '../request/api/salary';
 import { useAdminStore } from '../stores';
 import { usePagination } from 'vue-request';
 
@@ -118,6 +114,8 @@ let showEditPosition = ref(false);
 let showSalarySet = ref(false);
 //弹窗加载状态
 let confirmLoading = ref(false);
+//加载薪酬
+let salaryLoading = ref(false);
 
 //添加对象
 let newPosition = reactive({
@@ -132,35 +130,89 @@ let changePosition = reactive({
     pname: ''
 })
 
+//薪酬标准设置对象
+let salarySetObj = reactive({
+    pcategory: '',
+    pid: 0,
+    pname: '',
+    psalary: '',
+})
+
+//当前标准名称
+let cSalaryName = ref('');
+
+//薪酬标准列表
+let salaryList = reactive();
+
 //点击添加按钮
 function addPositionClicked() {
     showAddPosition.value = true;
 }
 //点击编辑按钮
-function editPositionClicked(data){
+function editPositionClicked(data) {
     changePosition.pcategory = data.posiCategory;
     changePosition.pid = data.pid;
     changePosition.pname = data.posiName;
     showEditPosition.value = true;
 }
+
+//点击设置薪酬按钮
+async function editPositionSalaryClicked(data) {
+    salaryLoading.value = true;
+    cSalaryName = ref('');
+    salaryList = (await getAllSalaryInfo(store.token)).data.data.data;
+    salarySetObj.pcategory = data.posiCategory;
+    salarySetObj.pid = data.pid;
+    salarySetObj.pname = data.posiName;
+    salarySetObj.psalary = data.posiSalary;
+    let res = await getSalaryInfoByID(store.token, data.pid);
+    if (res.data.success == true) {
+        cSalaryName.value = res.data.data.salaName;
+    }
+    showSalarySet.value = true;
+    salaryLoading.value = false;
+    console.log(cSalaryName.value)
+}
+
+//用户选择了薪酬标准
+function handleSalarySelect(value){
+    salarySetObj.psalary = value;
+}
+
+//开始设置薪酬标准
+//向服务器发送编辑请求
+async function startEditPositionSalary() {
+    let res = await editPosition(salarySetObj, store.token);
+    if (res.data.success != true) {
+        confirmLoading.value = false;
+        message.error(res.data.msg);
+    } else {
+        //编辑成功
+        showSalarySet.value = false;
+        confirmLoading.value = false;
+        message.success('编辑成功');
+        handleTableChange(pagInfo);
+    }
+}
+
 //关闭弹窗事件
-function stoploading(){
+function stoploading() {
     confirmLoading.value = false;
 }
 
 //向服务器发送添加请求
-async function startAddPosition(){
-    if(newPosition.pcategory == '' || newPosition.pname == ''  ){
+async function startAddPosition() {
+    if (newPosition.pcategory == '' || newPosition.pname == '') {
         message.error('请输入参数');
         return;
     }
     confirmLoading.value = true;
     //开始请求
-    let res = await addPosition(newPosition,store.token);
-    if(res.data.success != true){
+    let res = await addPosition(newPosition, store.token);
+    if (res.data.success != true) {
         message.error('职位添加失败');
         confirmLoading.value = false;
-    }else{
+    } else {
         //添加成功
         newPosition.pname = '';
         newPosition.pcategory = '';
@@ -170,30 +222,30 @@ async function startAddPosition(){
         handleTableChange(pagInfo);
     }
 
-    
+
 }
 
 
 //向服务器发送删除请求
-async function startDeletePosition(index){
-    let res = await deletePosition(index,store.token);
-    if(res.data.success != true){
+async function startDeletePosition(index) {
+    let res = await deletePosition(index, store.token);
+    if (res.data.success != true) {
         message.error(res.data.msg);
-    }else{
+    } else {
         //删除成功
         message.success('删除成功');
         handleTableChange(pagInfo);
-        
+
     }
 }
 
 //向服务器发送编辑请求
-async function startEditPosition(){
-    let res = await editPosition(changePosition,store.token);
-    if(res.data.success != true){
+async function startEditPosition() {
+    let res = await editPosition(changePosition, store.token);
+    if (res.data.success != true) {
         confirmLoading.value = false;
         message.error(res.data.msg);
-    }else{
+    } else {
         //编辑成功
         changePosition.pname = '';
         changePosition.pcategory = '';
@@ -201,37 +253,37 @@ async function startEditPosition(){
         confirmLoading.value = false;
         message.success('编辑成功');
         handleTableChange(pagInfo);
-        
+
     }
 }
 
 
 //获取职位信息
 let res = new reactive();
-async function startGetPositionInfo(index,count){
-    res.value = (await getPositionInfo(store.token,index,count));
+async function startGetPositionInfo(index, count) {
+    res.value = (await getPositionInfo(store.token, index, count));
     return res.value.data;
 }
 
 
 //表格分页
 const {
-      data: dataSource,
-      run,
-      loading,
-      current,
-      pageSize,
-    } = usePagination(startGetPositionInfo, {
-        pagination: {
-            currentKey: 'index',
-            pageSizeKey: 'count',
-        },
-    });
+    data: dataSource,
+    run,
+    loading,
+    current,
+    pageSize,
+} = usePagination(startGetPositionInfo, {
+    pagination: {
+        currentKey: 'index',
+        pageSizeKey: 'count',
+    },
+});
 
 const pagination = computed(() => ({
-      total: dataSource.value?.data.total,
-      current: current.value,
-      pageSize: pageSize.value,
+    total: dataSource.value?.data.total,
+    current: current.value,
+    pageSize: pageSize.value,
 }));
 
 
@@ -290,24 +342,27 @@ const columns = reactive(
 
 <style scoped>
 /* 顶部容器设置为弹性布局 */
-.position-header{
+.position-header {
     width: 100%;
     display: flex;
     align-items: center;
 }
-.position-title{
+
+.position-title {
     /* 标题样式 */
     font-size: 25px;
     font-weight: bold;
 }
+
 /* 职位表 */
-.position-table-contain{
+.position-table-contain {
     /* 容器样式 */
     width: 100%;
     display: flex;
     margin-top: 50px;
 }
-.position-table-table{
+
+.position-table-table {
     width: 100%;
 }
 </style>
