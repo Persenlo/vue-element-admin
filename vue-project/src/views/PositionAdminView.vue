@@ -32,10 +32,19 @@
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'action'">
                     <div style="width: 100%; display: flex; ">
-                        <a-button type="primary" style="margin-right: 10px;"
-                            @click="editPositionClicked(record)">编辑</a-button>
+                        
                         <a-button type="primary" style="margin-right: 10px;" @click="editPositionSalaryClicked(record)"
-                            :loading="salaryLoading">薪酬</a-button>
+                            :loading="salaryLoading">
+                            <template #icon>
+                                <DollarOutlined />
+                            </template>
+                        </a-button>
+
+                        <a-button type="primary" style="margin-right: 10px;"
+                            @click="editPositionClicked(record)">
+                            编辑
+                        </a-button>
+                        
                         <a-popconfirm ref="popconfirm" title="是否删除该职位?" @confirm="startDeletePosition(record.pid)"
                             ok-text="确定" cancel-text="取消">
                             <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
@@ -56,15 +65,11 @@
         </a-modal>
 
         <!-- 设置薪酬标准 -->
-        <a-modal v-model:visible="showSalarySet" title="设置薪酬标准" :confirm-loading="confirmLoading" @ok="startEditPositionSalary"
-            @cancel="stoploading" ok-text="设置" cancel-text="取消">
-            <a-select 
-                :value="salarySetObj.psalary" 
-                style="width: 100%" 
-                :placeholder="cSalaryName==''? '请选择薪酬标准': cSalaryName"
-                :options="salaryList"
-                :field-names="{ label: 'salaName', value: 'sid' }" 
-                @change="handleSalarySelect">
+        <a-modal v-model:visible="showSalarySet" title="设置薪酬标准" :confirm-loading="confirmLoading"
+            @ok="startEditPositionSalary" @cancel="stoploading" ok-text="设置" cancel-text="取消">
+            <a-select :value="salarySetObj.psalary" style="width: 100%"
+                :placeholder="cSalaryName == '' ? '请选择薪酬标准' : cSalaryName" :options="salaryList"
+                :field-names="{ label: 'salaName', value: 'sid' }" @change="handleSalarySelect">
             </a-select>
 
         </a-modal>
@@ -88,7 +93,7 @@
 
 <script setup>
 import { reactive, ref, computed } from 'vue';
-import { SearchOutlined } from '@ant-design/icons-vue';
+import { SearchOutlined, DollarOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { getPositionInfo, addPosition, deletePosition, editPosition } from '../request/api/position';
 import { getAllSalaryInfo, getSalaryInfoByID } from '../request/api/salary';
@@ -175,7 +180,7 @@ async function editPositionSalaryClicked(data) {
 }
 
 //用户选择了薪酬标准
-function handleSalarySelect(value){
+function handleSalarySelect(value) {
     salarySetObj.psalary = value;
 }
 

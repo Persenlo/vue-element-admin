@@ -56,3 +56,48 @@ export function editPosition(positionData,token){
         withCredentials: true,
     })
 }
+
+//获取职位分类
+export function getPositionCategory(token){
+    return service({
+        method: "Get",
+        url: "/employee/getPositionCategory",
+        params:{
+            
+        },
+        headers:{
+            'Authorization':token,
+        },
+        withCredentials: true,
+    })
+}
+
+//职位查询(ID)
+export function getPositionInfoById(token,id){
+    return service({
+        method: "Get",
+        url: "/position",
+        params:{
+            pId: id,
+        },
+        headers:{
+            'Authorization':token,
+        },
+        withCredentials: true,
+    })
+}
+
+//获取某个职位分类下的所有职位
+export function getPositionbyCategory(token,category){
+    return service({
+        method: "Get",
+        url: "/employee/getPosition",
+        params:{
+            categoryname: category,
+        },
+        headers:{
+            'Authorization':token,
+        },
+        withCredentials: true,
+    })
+}

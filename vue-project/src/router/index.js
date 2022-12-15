@@ -33,6 +33,16 @@ const router = createRouter({
       path: '/a-user',
       name: 'userAdmin',
       component: () => import('../views/UserAdminView.vue')
+    },
+    {
+      path: '/a-file',
+      name: 'fileAdmin',
+      component: () => import('../views/FileAdmin.vue')
+    },
+    {
+      path: '/edit-file',
+      name: 'editFile',
+      component: () => import('../views/FileEdit.vue')
     }
   ]
 })

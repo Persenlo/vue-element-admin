@@ -68,6 +68,26 @@
                 薪酬登记
             </span>
         </div>
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 1"
+            @click="navClicked(2)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-edit sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                档案登记
+            </span>
+        </div>
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 1"
+            @click="navClicked(3)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-image-text sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                档案管理
+            </span>
+        </div>
         <!-- 薪酬管理员 -->
 
 
@@ -96,6 +116,7 @@ import { useRouter } from 'vue-router';
             case 1:
                 //系统管理员
                 if(store.userInfo.userPermission == 10) router.push("/a-position");
+                
                 //经理
 
                 //专员
@@ -103,11 +124,11 @@ import { useRouter } from 'vue-router';
                 break;
             case 2:
                 //系统管理员
-                router.push("/a-organization");
+                if(store.userInfo.userPermission == 10) router.push("/a-organization");
                 //经理
-
+                
                 //专员
-
+                if(store.userInfo.userPermission == 1) router.push("/edit-file");
                 break;
             case 3:
                 //系统管理员
@@ -115,7 +136,7 @@ import { useRouter } from 'vue-router';
                 //经理
 
                 //专员
-
+                if(store.userInfo.userPermission == 1) router.push("/a-file");
                 break;
             case 4:
                 //系统管理员
