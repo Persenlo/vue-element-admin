@@ -111,16 +111,6 @@
                 档案管理
             </span>
         </div>
-        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 2"
-            @click="navClicked(3)"
-            :style="store.navOn? 
-                    'width: 193px':
-                    'width: 48px'">
-            <i class="iconfont icon-image-text sider-nav-item-icon"/>
-            <span class="sider-nav-item-text" v-if="store.navOn">
-                档案回收站
-            </span>
-        </div>
         <!-- 经理 -->
 
 
@@ -166,7 +156,7 @@ import { useRouter } from 'vue-router';
                 //系统管理员
                 if(store.userInfo.userPermission == 10) router.push("/a-salary");
                 //经理
-                if(store.userInfo.userPermission == 2) router.push("");
+
                 //专员
                 if(store.userInfo.userPermission == 1) router.push("/a-file");
                 break;

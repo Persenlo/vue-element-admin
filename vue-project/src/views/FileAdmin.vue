@@ -3,8 +3,9 @@
         <span class="file-title">档案管理</span>
         
         <a-radio-group v-model:value="showAll" style="margin-left: 2%;">
-            <a-radio-button :value='true'>全部</a-radio-button>
-            <a-radio-button :value='false'>未复核</a-radio-button>
+            <a-radio-button :value='"all"'>全部</a-radio-button>
+            <a-radio-button :value='"uncheck"'>未复核</a-radio-button>
+            <a-radio-button :value='"del"'>回收站</a-radio-button>
         </a-radio-group>
         
         <div style="flex-grow: 1;"></div>
@@ -52,9 +53,14 @@
 
 
                 <template v-if="column.key === 'action'">
-                    <div style="width: 100%; display: flex; ">
+                    <div style="width: 100%; display: flex; " v-if="showAll === 'del'">
+                        <a-popconfirm ref="popconfirm" title="是否恢复该档案?" @confirm="startRestoreFile(record.eid)" ok-text="确定" cancel-text="取消">
+                            <a-button type="primary" style="margin-right: 10px;" >恢复</a-button>
+                        </a-popconfirm>
+                    </div>
+                    <div style="width: 100%; display: flex; " v-else>
                         <a-button type="primary" style="margin-right: 10px;" @click="toDetail(record.eid)">详情</a-button>
-                        <a-popconfirm ref="popconfirm" title="是否删除该标准?" @confirm="startDeleteFile(record.eid)"
+                        <a-popconfirm ref="popconfirm" title="是否删除该档案?" @confirm="startDeleteFile(record.eid)"
                             v-if="!isAssistant" ok-text="确定" cancel-text="取消">
                             <a-button type="primary" danger style="margin-right: 10px;">删除</a-button>
                         </a-popconfirm>
@@ -121,7 +127,7 @@
 <script setup>
 import { reactive, ref, computed, watch } from 'vue';
 import { SearchOutlined, DollarOutlined } from '@ant-design/icons-vue';
-import { getFileInfo,deleteFile,getUncheckFileInfo } from '../request/api/file';
+import { getFileInfo,deleteFile,getUncheckFileInfo,getDelFileInfo,restoreFile } from '../request/api/file';
 import { getOrgA,getOrgB,getOrgC,addOrganization,editSOrganization,deleteOrganization  } from '../request/api/organization';
 import { getPositionCategory,getPositionbyCategory,getPositionInfoById } from '../request/api/position';
 import { message } from 'ant-design-vue';
@@ -241,7 +247,7 @@ let confirmLoading = ref(false);
 //是专员
 let isAssistant = ref(store.userInfo.userPermission == "1" ? true : false)
 //内容选择器
-let showAll = ref(true);
+let showAll = ref('all');
 watch(showAll,(newValue)=>{
     handleTableChange(pagInfo);
 })
@@ -281,20 +287,35 @@ async function startDeleteFile(id) {
 
     }
 }
+//开始恢复档案
+async function startRestoreFile(id) {
+    let res = await restoreFile(store.token,id);
+    if (res.data.success != true) {
+        message.error(res.data.msg);
+    } else {
+        //删除成功
+        message.success('恢复成功');
+        handleTableChange(pagInfo);
+
+    }
+}
 
 //开始获取档案
 let res = new reactive();
 async function startGetFileInfo(index, count) {
-    if(showAll.value){
+    if(showAll.value == 'all'){
         res.value = (await getFileInfo(store.token, index, count));
         console.log(showAll.value)
         return res.value.data;
-    }else if(!showAll.value){
+    }else if(showAll.value === 'uncheck'){
         res.value = (await getUncheckFileInfo(store.token, index, count));
+        return res.value.data
+    }else if(showAll.value === 'del'){
+        res.value = (await getDelFileInfo(store.token, index, count));
         return res.value.data
     }
 }
-
+//跳转到详情
 function toDetail(value){
     router.push({
         name: 'viewFile',

@@ -135,7 +135,7 @@
             </div>
             <!-- 按钮组 -->
             <div style="display: flex; justify-content: end; width: auto; margin-top: 20px;">
-                <a-button :type="hideCommit?'primary':'danger'" shape="circle" style="margin-right: 10px;" @click="changeEditMode" :disabled="changeSalary.salaRecheckerName!=null">
+                <a-button :type="hideCommit?'primary':'danger'" shape="circle" style="margin-right: 10px;" @click="changeEditMode" :disabled="changeSalary.salaRecheckerName!=null&&isManager">
                     <template #icon>
                         <form-outlined v-if="hideCommit" />
                         <close-outlined v-else />
