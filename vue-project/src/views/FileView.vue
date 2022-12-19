@@ -203,11 +203,19 @@
                             </a-button>
                     </a-upload>
 
-                    <a-form-item label="性别" name="emplGender" style="margin-top: 10px;" :rules="[{ required: true, message: '请输入性别' }]" :label-col="{ span: 10 }" :wrapper-col="{ offset: 0, span: 14 }">
+                    <a-form-item label="性别" name="emplGender" style="margin-top: 10px;" :rules="[{ required: true, message: '请输入性别' }]" :label-col="{ span: 0 }" :wrapper-col="{ offset: 0, span: 24 }">
                         <a-select v-model:value="formState.emplGender">
                             <a-select-option value="男">男</a-select-option>
                             <a-select-option value="女">女</a-select-option>
                         </a-select>
+                    </a-form-item>
+
+                    <a-form-item label="登记日" :label-col="{ span: 0 }" :wrapper-col="{ offset: 0, span: 24 }"> 
+                        <a-date-picker v-model:value="formState.emplRecoddate" placeholder="登记日期" style="width: 100%;" format="YYYY-MM-DD"  valueFormat="YYYY-MM-DD HH:mm:ss" disabled="true">
+                            <template #suffixIcon>
+                                
+                            </template>
+                        </a-date-picker>
                     </a-form-item>
                 </a-col>
             </a-row>

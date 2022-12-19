@@ -2,10 +2,10 @@
     <div class="file-header">
         <span class="file-title">档案管理</span>
         
-        <a-radio-group v-model:value="showAll" style="margin-left: 2%;">
+        <a-radio-group v-model:value="showAll" style="margin-left: 2%;" >
             <a-radio-button :value='"all"'>全部</a-radio-button>
             <a-radio-button :value='"uncheck"'>未复核</a-radio-button>
-            <a-radio-button :value='"del"'>回收站</a-radio-button>
+            <a-radio-button :value='"del"' v-if="store.userInfo.userPermission == 2">回收站</a-radio-button>
         </a-radio-group>
         
         <div style="flex-grow: 1;"></div>
@@ -264,12 +264,15 @@ async function searchFileClicked() {
 //开始搜索
 function startSearchFile() {
     router.push({
-        name: 'searchSalary',
+        name: 'searchFile',
         query: {
-            sid: searchSalary.sid,
-            key: searchSalary.key,
-            start: searchSalary.date[0],
-            end: searchSalary.date[1],
+            oaid: searchFile.oaid,
+            obid: searchFile.obid,
+            ocid: searchFile.ocid,
+            categoryname: searchFile.categoryname,
+            pid: searchFile.pid,
+            start: searchFile.date[0],
+            end: searchFile.date[1],
         },
     })
     showSearchSalary.value = false;
@@ -386,6 +389,12 @@ const columns = reactive(
             dataIndex: 'empl_recoderName',
             key: 'empl_recoderName',
             width: '15%',
+        },
+        {
+            title: '登记时间',
+            dataIndex: 'emplRecoddate',
+            key: 'emplRecoddate',
+            width: '25%',
         },
         {
             title: '档案状态',

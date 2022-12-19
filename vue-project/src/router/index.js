@@ -48,6 +48,11 @@ const router = createRouter({
       path: '/view-file',
       name: 'viewFile',
       component: () => import('../views/FileView.vue')
+    },
+    {
+      path: '/search-file',
+      name: 'searchFile',
+      component: () => import('../views/FileSearch.vue')
     }
   ]
 })

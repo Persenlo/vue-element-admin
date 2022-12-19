@@ -105,6 +105,28 @@ export function getDelFileInfo(token,param){
     })
 }
 
+// 搜索档案
+export function searchFile(searchData,token){
+    return service({
+        method: "Get",
+        url: "/employee/queryEmployee",
+        headers:{
+            'Authorization': token,
+        },
+        params:{
+            oaid: searchData.oaid,
+            obid: searchData.obid,
+            ocid: searchData.ocid,
+            categoryname: searchData.categoryname,
+            pid: searchData.pid,
+            start: searchData.start,
+            end: searchData.nd,
+        },
+        withCredentials: true,
+    })
+}
+
+
 //删除档案
 export function deleteFile(token,id){
     return service({
