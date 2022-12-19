@@ -17,7 +17,7 @@
 .main{
     width: auto;
     height: auto;
-    min-height: 850px;
+    min-height: 905px;
     /* 外观设计 */
     padding: 50px 50px 50px 50px;
     margin: 0 50px 0 30px;

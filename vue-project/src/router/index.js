@@ -43,6 +43,11 @@ const router = createRouter({
       path: '/edit-file',
       name: 'editFile',
       component: () => import('../views/FileEdit.vue')
+    },
+    {
+      path: '/view-file',
+      name: 'viewFile',
+      component: () => import('../views/FileView.vue')
     }
   ]
 })

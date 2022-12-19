@@ -90,6 +90,39 @@
         </div>
         <!-- 薪酬管理员 -->
 
+        <!-- 经理 -->
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 2"
+            @click="navClicked(1)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-chart-bar sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                薪酬管理
+            </span>
+        </div>
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 2"
+            @click="navClicked(2)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-image-text sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                档案管理
+            </span>
+        </div>
+        <div class="sider-nav-item" v-if="store.userInfo.userPermission == 2"
+            @click="navClicked(3)"
+            :style="store.navOn? 
+                    'width: 193px':
+                    'width: 48px'">
+            <i class="iconfont icon-image-text sider-nav-item-icon"/>
+            <span class="sider-nav-item-text" v-if="store.navOn">
+                档案回收站
+            </span>
+        </div>
+        <!-- 经理 -->
+
 
 
     </div>
@@ -116,9 +149,8 @@ import { useRouter } from 'vue-router';
             case 1:
                 //系统管理员
                 if(store.userInfo.userPermission == 10) router.push("/a-position");
-                
                 //经理
-
+                if(store.userInfo.userPermission == 2) router.push("/a-salary");
                 //专员
                 if(store.userInfo.userPermission == 1) router.push("/a-salary");
                 break;
@@ -126,21 +158,21 @@ import { useRouter } from 'vue-router';
                 //系统管理员
                 if(store.userInfo.userPermission == 10) router.push("/a-organization");
                 //经理
-                
+                if(store.userInfo.userPermission == 2) router.push("/a-file");
                 //专员
                 if(store.userInfo.userPermission == 1) router.push("/edit-file");
                 break;
             case 3:
                 //系统管理员
-                router.push("/a-salary");
+                if(store.userInfo.userPermission == 10) router.push("/a-salary");
                 //经理
-
+                if(store.userInfo.userPermission == 2) router.push("");
                 //专员
                 if(store.userInfo.userPermission == 1) router.push("/a-file");
                 break;
             case 4:
                 //系统管理员
-                router.push("/a-user");
+                if(store.userInfo.userPermission == 10) router.push("/a-user");
                 //经理
 
                 //专员
@@ -178,7 +210,7 @@ import { useRouter } from 'vue-router';
 .sider{
     width: 225px;
     height: auto;
-    min-height: 850px;
+    min-height: 905px;
     /* 外观设计 */
     padding: 20px 16px 0 16px;
     margin-left:  50px;

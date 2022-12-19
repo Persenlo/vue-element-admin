@@ -57,7 +57,7 @@
 
             
 
-            <div :style='isAssistant?"display: flex; justify-content: center; width: auto;":""'>
+            <div :style='!isAdmin?"display: flex; justify-content: center; width: auto;":""'>
 
                 
 
@@ -67,46 +67,47 @@
                     <a-divider style="margin-top: 0;">基本内容</a-divider>
                     <div style="display: flex; align-items: center; margin-top: 20px;">
                         <span style="width: 100px;">薪酬名称：</span><a-input v-model:value="changeSalary.salaName"
-                            placeholder="输入薪酬名称" :disabled="!editMode" />
+                            placeholder="输入薪酬名称" :disabled="!editMode||!isAssistant" />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">基本工资：</span><a-input v-model:value="changeSalary.salaBase"
-                            placeholder="输入基本工资" suffix="元" type="number" :disabled="!editMode" />
+                            placeholder="输入基本工资" suffix="元" type="number" :disabled="!editMode||!isAssistant" />
                     </div>
 
-                    <a-divider v-if="isAssistant">三险一金</a-divider>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant"> 
+                    <a-divider v-if="!isAdmin">三险一金</a-divider>
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin"> 
                         <span style="width: 100px;">养老保险：</span><a-input v-model:value="changeSalary.salaOld" suffix="元"
                             type="number" :disabled=true />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">医疗保险：</span><a-input v-model:value="changeSalary.salaMedical"
                             suffix="元" type="number" :disabled=true />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">失业保险：</span><a-input v-model:value="changeSalary.salaUnemployee"
                             suffix="元" type="number" :disabled=true />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">住房公积金</span><a-input v-model:value="changeSalary.salaHouse"
                             suffix="元" type="number" :disabled=true />
                     </div>
+                    
                 </div>
 
                 <!-- 右半部分 -->
-                <div :style='isAssistant?"margin-left: 50px;":""'>
-                    <a-divider style="margin-top: 0;" v-if="isAssistant">员工补助</a-divider>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                <div :style='!isAdmin?"margin-left: 50px;":""'>
+                    <a-divider style="margin-top: 0;" v-if="!isAdmin">员工补助</a-divider>
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">交通补贴：</span><a-input v-model:value="changeSalary.salaTransport"
-                            placeholder="输入交通补贴" suffix="元" type="number" :disabled="!editMode" />
+                            placeholder="输入交通补贴" suffix="元" type="number" :disabled="!editMode||!isAssistant" />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">午餐补助：</span><a-input v-model:value="changeSalary.salaLunch"
-                            placeholder="输入午餐补助" suffix="元" type="number" :disabled="!editMode" />
+                            placeholder="输入午餐补助" suffix="元" type="number" :disabled="!editMode||!isAssistant" />
                     </div>
-                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="isAssistant">
+                    <div style="display: flex; align-items: center; margin-top: 20px;" v-if="!isAdmin">
                         <span style="width: 100px;">通讯补助：</span><a-input v-model:value="changeSalary.salaCommunicate"
-                            placeholder="输入通讯补助" suffix="元" type="number" :disabled="!editMode" />
+                            placeholder="输入通讯补助" suffix="元" type="number" :disabled="!editMode||!isAssistant" />
                     </div>
 
                     <a-divider>编辑人员</a-divider>
@@ -115,31 +116,41 @@
                             :disabled=true />
                     </div>
                     <div style="display: flex; align-items: center; margin-top: 20px;">
-                        <span style="width: 100px;">登记人名称</span><a-input v-model:value="changeSalary.salaRecheckerName"
+                        <span style="width: 100px;">登记人名称</span><a-input v-model:value="changeSalary.salaRegistrantName"
                             :disabled=true />
                     </div>
                     <div style="display: flex; align-items: center; margin-top: 20px;">
-                        <span style="width: 100px;">复核人名称</span><a-input v-model:value="changeSalary.salaRegistrantName"
+                        <span style="width: 100px;">复核人名称</span><a-input v-model:value="changeSalary.salaRecheckerName"
                             :disabled=true />
                     </div>
 
-                    <!-- 按钮组 -->
-                    <div style="display: flex; justify-content: end; width: auto; margin-top: 20px;">
-                        <a-button :type="hideCommit?'primary':'danger'" shape="circle" style="margin-right: 10px;" @click="changeEditMode" >
-                            <template #icon>
-                                <form-outlined  v-if="hideCommit" />
-                                <close-outlined v-else/>
-                            </template>
-                        </a-button>
-                        <a-button type="primary" shape="round" @click="startEditSalary" :disabled="hideCommit" :loading="confirmLoading">
-                            提交更改
-                        </a-button>
-                    </div>
+                    
 
                 </div>
-            </div>
-            
 
+
+            </div>
+            <div style="display: flex; align-items: center; justify-content: center; margin-top: 20px; width: 100%;">
+                <span style="width: 10%;">复核意见：</span><a-input style="width: 80%;" v-model:value="changeSalary.salaRecheckmsg" :disabled='isAdmin||isAssistant||!editMode' />
+            </div>
+            <!-- 按钮组 -->
+            <div style="display: flex; justify-content: end; width: auto; margin-top: 20px;">
+                <a-button :type="hideCommit?'primary':'danger'" shape="circle" style="margin-right: 10px;" @click="changeEditMode" :disabled="changeSalary.salaRecheckerName!=null">
+                    <template #icon>
+                        <form-outlined v-if="hideCommit" />
+                        <close-outlined v-else />
+                    </template>
+                </a-button>
+                <a-button type="primary" shape="round" @click="startEditSalary" :disabled="hideCommit" :loading="confirmLoading"
+                    v-if="!isManager">
+                    提交更改
+                </a-button>
+                <a-button type="primary" shape="round" @click="startRecheckSalary" :disabled="hideCommit" :loading="confirmLoading"
+                    v-if="isManager">
+                    复核确认
+                </a-button>
+            </div>
+                    
         </div>
         
     </a-modal>
@@ -156,7 +167,7 @@ import { reactive, ref, onMounted } from 'vue';
 import { FormOutlined,CloseOutlined,LeftOutlined } from '@ant-design/icons-vue';
 import { useRouter,useRoute, routerKey } from 'vue-router';
 import { useAdminStore } from '../stores';
-import { searchSalary, editSalary } from '../request/api/salary';
+import { searchSalary, editSalary, recheckSalary } from '../request/api/salary';
 import { message } from 'ant-design-vue';
 
 const store = useAdminStore();
@@ -228,11 +239,15 @@ let editMode = ref(false);
 let hideCommit = ref(true);
 //弹窗加载状态
 let confirmLoading = ref(false);
-//是专员
+//身份判断
 let isAssistant = ref(store.userInfo.userPermission == "1"? true:false)
+let isManager = ref(store.userInfo.userPermission == "2"? true:false)
+let isAdmin = ref(store.userInfo.userPermission == "10"? true:false)
 
 //编辑薪酬按钮被点击
 async function editSalaryClicked(data) {
+    editMode.value = false;
+    hideCommit.value = true;
     showEditSalary.value = true;
     changeSalary.value = data;
 }
@@ -280,6 +295,26 @@ async function startEditSalary() {
         confirmLoading.value = false;
         message.success('编辑成功');
         handleTableChange(pagInfo);
+    }
+}
+
+//复核
+async function startRecheckSalary(){
+    confirmLoading.value = true;
+    let data = {
+        rechecker: 0,
+        recheckmsg: changeSalary.value.salaRecheckmsg,
+        sid: changeSalary.value.sid,
+    }
+    let res = await recheckSalary(data, store.token);
+    if (res.data.success != true) {
+        message.error(res.data.msg);
+        confirmLoading.value = false;
+    } else {
+        showEditSalary.value = false;
+        confirmLoading.value = false;
+        message.success('复核成功');
+        window.location.reload();
     }
 }
 

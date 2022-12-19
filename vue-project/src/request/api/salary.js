@@ -104,3 +104,17 @@ export function searchSalary(searchData,token){
         withCredentials: true,
     })
 }
+
+//复核
+export function recheckSalary(SalaryData,token){
+    return service({
+        method: "Post",
+        url: "/salary/recheck",
+        data: SalaryData,
+        headers:{
+            'Content-Type':'application/json',
+            'Authorization': token,
+        },
+        withCredentials: true,
+    })
+}

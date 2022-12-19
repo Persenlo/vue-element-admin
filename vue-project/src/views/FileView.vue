@@ -1,9 +1,14 @@
 <template>
-
+        
     <div class="file-header">
-        <span class="file-title">档案登记</span>
+        <!-- 返回 -->
+        <a-button shape="circle" style="margin-right: 10px;" size="middle" @click="router.go(-1)">
+            <template #icon>
+                <left-outlined />
+            </template>
+        </a-button>
+        <span class="file-title">档案详情</span>
         <div style="flex-grow: 1;"></div>
-
     </div>
 
     <div style="margin-top: 50px; margin-left: 10%;">
@@ -25,8 +30,7 @@
                     <a-form-item label="一级机构" :span="3" :rules="[{ required: true, message: '请选择一级机构' }]" name="emplOrganizationA">
                         <a-select 
                             v-model:value="formState.emplOrganizationA"
-                            :disabled="orgaDisabled"
-                            :loading="orgaDisabled"
+                            :disabled="true"
                             :options="orgaSelects"
                             :field-names="{ label: 'orgaName', value: 'oid' }" 
                             @change="onOrgaSelected"
@@ -38,8 +42,7 @@
                     <a-form-item label="职位分类">
                         <a-select 
                             v-model:value="posiCategory"
-                            :disabled="posiCateDisabled"
-                            :loading="posiCateDisabled"
+                            :disabled="true"
                             :options="posiCateSelects"
                             :field-names="{ label: 'posiCategory', value: 'posiCategory' }" 
                             @change="onPosiCateSelected"
@@ -90,8 +93,7 @@
                         <a-select 
                             v-model:value="formState.emplOrganizationB"
                             :options="orgbSelects"
-                            :disabled="orgbDisabled"
-                            :loading="orgbDisabled"
+                            :disabled="true"
                             :field-names="{ label: 'orgaName', value: 'oid' }" 
                             @change="onOrgbSelected"
                             >
@@ -102,8 +104,7 @@
                     <a-form-item label="职位名称" :rules="[{ required: true, message: '请选择职位名称' }]" name="emplPosition">
                         <a-select 
                             v-model:value="formState.emplPosition"
-                            :disabled="posiNameDisabled"
-                            :loading="posiNameDisabled"
+                            :disabled="true"
                             :options="posiNameSelects"
                             :field-names="{ label: 'posiName', value: 'pid' }" 
                             @change="onPosiNameSelected"
@@ -146,8 +147,7 @@
                         <a-select 
                             v-model:value="formState.emplOrganizationC"
                             :options="orgcSelects"
-                            :loading="orgcDisabled"
-                            :disabled="orgcDisabled"
+                            :disabled="true"
                             :field-names="{ label: 'orgaName', value: 'oid' }" 
                             @change="onOrgcSelected"
                             >
@@ -244,7 +244,8 @@
             </a-form-item>
 
             <a-form-item :wrapper-col="{ offset: 19, span: 2 }" style="width: 100%;">
-                <a-button type="primary" html-type="submit" style="width: 100%;">提交</a-button>
+                <a-button type="primary" html-type="submit" style="width: 100%;" v-if="isAssistant">更新</a-button>
+                <a-button type="primary" html-type="submit" style="width: 100%;" v-if="!isAssistant">复核</a-button>
             </a-form-item>
 
 
@@ -263,18 +264,20 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
-import { SearchOutlined, DollarOutlined } from '@ant-design/icons-vue';
+import { FormOutlined,CloseOutlined,LeftOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import { getPositionCategory,getPositionbyCategory,getPositionInfoById } from '../request/api/position';
-import { addFile } from '../request/api/file';
+import { addFile,getFileInfobyId,updateFile,recheckFile } from '../request/api/file';
 import { getOrgA,getOrgB,getOrgC,addOrganization,editSOrganization,deleteOrganization  } from '../request/api/organization';
 import { getAllSalaryInfo, getSalaryInfoByID } from '../request/api/salary';
 import { useAdminStore } from '../stores';
 import { usePagination } from 'vue-request';
-import { useRouter } from 'vue-router';
+import { useRouter,useRoute, routerKey } from 'vue-router';
+
 
 const store = useAdminStore();
 const router = useRouter();
+const route = useRoute();
 
 //图片
 const handleChange = (info) => {
@@ -283,7 +286,7 @@ const handleChange = (info) => {
       }
       if (info.file.status === "done" && info.file.response.success) {
         message.success(`${info.file.name} 上传成功`);
-        formState.emplAvatar = info.file.response.data;
+        formState.value.emplAvatar = info.file.response.data;
       } else if (info.file.status === "done" && !info.file.response.success){
         message.error(`${info.file.name} 上传失败`);
       }
@@ -293,6 +296,8 @@ const headers = {
     'Authorization': store.token,
 }
 
+//是专员
+let isAssistant = ref(store.userInfo.userPermission == "1" ? true : false)
 //职位分类
 let posiCategory = ref('');
 //薪酬名称
@@ -300,19 +305,20 @@ let salaryName = ref('');
 //一级机构选项
 let orgaSelects = reactive();
 //二级机构选项
-let orgbSelects = reactive();
+let orgbSelects = ref();
 //三级机构选项
-let orgcSelects = reactive();
+let orgcSelects = ref();
 //职位分类选项
 let posiCateSelects = reactive();
 //职位名称选项
-let posiNameSelects = reactive();
+let posiNameSelects = ref();
 //选择框状态
-let orgaDisabled = ref(true);
-let orgbDisabled = ref(true);
-let orgcDisabled = ref(true);
-let posiCateDisabled = ref(true);
-let posiNameDisabled = ref(true);
+let orgaDisabled = ref(false);
+let orgbDisabled = ref(false);
+let orgcDisabled = ref(false);
+let posiCateDisabled = ref(false);
+let posiNameDisabled = ref(false);
+
 
 //获取一级机构
 async function startGetOrga(){
@@ -326,7 +332,7 @@ async function startGetOrga(){
 async function startGetOrgb(id){
     let res = (await getOrgB(store.token,id));
     if(res.data.success == true){
-        orgbSelects = res.data.data;
+        orgbSelects.value = res.data.data;
         orgbDisabled.value = false;
     }
 }
@@ -334,7 +340,7 @@ async function startGetOrgb(id){
 async function startGetOrgc(id){
     let res = (await getOrgC(store.token,id));
     if(res.data.success == true){
-        orgcSelects = res.data.data;
+        orgcSelects.value = res.data.data;
         orgcDisabled.value = false;
     }
 }
@@ -350,7 +356,7 @@ async function startGetPosiCate(){
 async function startGetPosiName(value){
     let res = (await getPositionbyCategory(store.token,value));
     if(res.data.success == true){
-        posiNameSelects = res.data.data;
+        posiNameSelects.value = res.data.data;
         posiNameDisabled.value = false;
     }
 }
@@ -364,7 +370,7 @@ async function startGetSalary(value){
         if(res2.data.success == false){
             message.error("获取薪酬标准失败，请检查网络连接");
         }else{
-            formState.emplSalary = res2.data.data.sid
+            formState.value.emplSalary = res2.data.data.sid
             salaryName.value = res2.data.data.salaName
             console.log(res2.data.data)
         }
@@ -373,18 +379,18 @@ async function startGetSalary(value){
 
 //一级机构被选中
 function onOrgaSelected(value){
-    formState.emplOrganizationB = '';
-    formState.emplOrganizationC = '';
-    orgbSelects = reactive('');
-    orgcSelects = reactive('');
+    formState.value.emplOrganizationB = '';
+    formState.value.emplOrganizationC = '';
+    orgbSelects.value = ref('');
+    orgcSelects.value = ref('');
     orgbDisabled.value = true;
     orgcDisabled.value = true;
     startGetOrgb(value);
 }
 //二级机构被选中
 function onOrgbSelected(value){
-    formState.emplOrganizationC = '';
-    orgcSelects = reactive('');
+    formState.value.emplOrganizationC = '';
+    orgcSelects = ref('');
     orgcDisabled.value  = true;
     startGetOrgc(value);
 
@@ -396,8 +402,8 @@ function onOrgcSelected(value){
 //职位分类被选中
 function onPosiCateSelected(value){
     posiNameDisabled.value = true;
-    formState.emplPosition = '';
-    posiNameSelects = reactive('');
+    formState.value.emplPosition = '';
+    posiNameSelects = ref('');
     startGetPosiName(value);
 }
 //职位名称被选中
@@ -407,7 +413,7 @@ function onPosiNameSelected(value){
 
 
 //表单对象
-let formState = reactive({
+let formState = ref({
     emplAddress: "",
     emplAge: "",
     emplAvatar: "",
@@ -444,29 +450,59 @@ let formState = reactive({
 
 
 function onFinish() {
-    startAddFile();
+    startUpdate();
 }
 function onFinishFailed(){
-    console.log("fail")
-    console.log(formState)
+    
 }
 
 //开始发送请求
-async function startAddFile(){
-    let res = (await addFile(store.token,formState))
-    if(res.data.success == false){
-        message.error(res.data.msg);
+async function startUpdate(){
+    if(isAssistant.value){
+        //专员更新
+        let res = (await updateFile(store.token, formState.value))
+        if (res.data.success == false) {
+            message.error(res.data.msg);
+        } else {
+            message.success("更新成功")
+            router.go(-1)
+        }
     }else{
-        message.success("提交成功");
-        router.push("/a-file");
+        //经理复核
+        let res = (await recheckFile(store.token, formState.value))
+        if (res.data.success == false) {
+            message.error(res.data.msg);
+        } else {
+            message.success("复核成功")
+            router.go(-1)
+        }
+    }
+}
+
+//开始获取信息
+async function startGetInfo(){
+    let res = await getFileInfobyId(store.token,route.query.id);
+    if(res.data.success == true){
+        formState.value = res.data.data[0]
+        formState.value.emplBirthday =  formState.value.emplBirthday.replace('T',' ')
+        console.log(formState.value)
+        //获取后续信息
+        await startGetOrgb(formState.value.emplOrganizationA)
+        await startGetOrgc(formState.value.emplOrganizationB)
+        await startGetPosiName(formState.value.empl_position_Category_name)
+        posiCategory.value = formState.value.empl_position_Category_name;
+        await startGetSalary(formState.value.emplPosition)
+    }else{
+        message.error("获取信息失败，请检查网络设置")
+        router.go(-1);
     }
 }
 
 
-
-onMounted(()=>{
-    startGetOrga();
-    startGetPosiCate();
+onMounted(async()=>{
+    await startGetOrga();
+    await startGetPosiCate();
+    await startGetInfo();
 })
 
 </script>
