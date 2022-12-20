@@ -19,7 +19,7 @@
     <div class="user-table-contain">
         <!-- 基础表格 -->
         <a-table 
-            :data-source=dataSource?.data 
+            :data-source=dataSource?.data.data
             :columns="columns" 
             :pagination="pagination" 
             :loading="loading"
