@@ -38,13 +38,27 @@ import HeaderVue from './layout/Header.vue';
 import SiderVue from './layout/Sider.vue'
 import MainVue from './layout/Main.vue';
 import FooterVue from './layout/Footer.vue';
-
+import { getUserInfo } from './request/api/user';
 import LoginVue from './views/LoginVue.vue';
 
 import { useAdminStore } from './stores';
+import { onMounted } from 'vue';
+import { message } from 'ant-design-vue';
 
 
   const store = useAdminStore();
+
+  onMounted(async()=>{
+    let res =  await getUserInfo(store.token)
+    if(res.data.success == false){
+      message.error("登录已过期");
+      store.token = null;
+		  store.userInfo = {uid: -1, userName: "未登录", userNo: "-1", userPermission: 0};
+      store.isLogin = false;
+		  localStorage.removeItem("token");
+		  localStorage.removeItem("userInfo");
+    }
+  })
 
 
 </script>

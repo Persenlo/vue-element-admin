@@ -10,10 +10,10 @@ import 'ant-design-vue/dist/antd.css';
 import './assets/css/base.css'
 import "@/assets/iconfont/iconfont.css"
 
+
 const app = createApp(App)
 
 app.use(Antd)
-
 app.use(createPinia())
 app.use(router)
 
