@@ -337,13 +337,17 @@ async function addOrganizationByParam(level,name,parendId){
         message.error('请输入机构名称');
         return;
     }
+    if(parendId == null){
+        message.error('请先选择机构');
+        return;
+    }
     confirmLoading.value = true;
-    let createObj = {
+    let obj = {
         orgaLevel: level,
         orgaName: name,
         orgaParent: parendId,
     }
-    let res = await addOrganization(createObj,store.token);
+    let res = await addOrganization(obj,store.token);
     if(res.data.success == false){
         message.error(res.data.msg);
         confirmLoading.value = false;
@@ -351,6 +355,7 @@ async function addOrganizationByParam(level,name,parendId){
         message.success("添加成功")
         confirmLoading.value = false;
         showAddOrganization.value = false
+        createObj.value.orgaName = '';
         handleTableChange(level);
     }
 }
